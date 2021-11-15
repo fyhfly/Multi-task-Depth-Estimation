@@ -11,7 +11,7 @@ This is the PyTorch implementation for our paper.
 [KITTI](http://www.cvlibs.net/datasets/kitti/raw_data.php)
 
 
-Prepare the two datasets according to the datalists (*.txt in [datasets](https://github.com/sshan-zhao/GASDA/tree/master/datasets))
+Prepare the two datasets according to the datalists (*.txt in [datasets](https://github.com/fyhfly/Multi-task-Depth-Estimation/tree/main/datasets))
 ```
 datasets
   |----kitti 
