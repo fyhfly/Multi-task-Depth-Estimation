@@ -27,7 +27,7 @@ datasets
 ## Training (RTX 3090, 24GB)
 
 ```
-python train.py --model lv --gpu_ids 0 --niter 5 --niter_decay 45 --batchSize 8
+python train.py --model lv --gpu_ids 0 --niter 5 --niter_decay 20 --batchSize 8
 ```
 
 ## Test
