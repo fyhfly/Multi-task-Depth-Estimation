@@ -39,11 +39,13 @@ class LVModel(BaseModel):
         if self.isTrain:
             self.loss_names = ['depth_recon', 'flip_recon', 'seg_con', 'dep_con', 'f_dep_con']
             self.loss_names += ['smooth_l', 'smooth_f']
+            # self.loss_names += ['seg_recon', 'lseg_recon']
             self.loss_names += ['delta1', 'delta2']
 
         if self.isTrain:
             self.visual_names = ['left_img', 'right_img', 'segment', 'l_segment', 'l_depth', 'warp_l_img']
             self.visual_names += ['flip_right_seg', 'f_segment', 'f_depth_flip', 'warp_f_img']
+            # self.visual_names += ['warp_r_seg', 'warp_l_seg']
 
         else:
             self.visual_names = ['img', 'depth', 'segment']
@@ -107,11 +109,13 @@ class LVModel(BaseModel):
             self.feature_map = self.net_Encoder(self.img)
             self.d, self.s = self.net_Decoder(self.feature_map)
             # self.flip = torch.flip(self.img, [-1])
-            # self.f, _ = self.net_Decoder(self.net_Encoder(self.flip))
+            # self.f, self.fs = self.net_Decoder(self.net_Encoder(self.flip))
+            # self.fs = torch.flip(self.fs, [-1])
+            # self.s = (self.s+self.fs)*0.5
             self.segment = self.s.argmax(dim=1, keepdim=True).float()
             # self.d = torch.unsqueeze(self.d, 0)
             # self.f = torch.unsqueeze(self.f, 0)
-            # self.depth =  torch.cat((self.d, self.f), 0)
+            # self.d =  torch.cat((self.d, self.f), 0)
             self.depth = self.d
 
 
@@ -150,6 +154,13 @@ class LVModel(BaseModel):
         # right smooth
         self.loss_smooth_f = self.criterionSmooth(self.f_depth, self.flip_left_img) * lambda_Smooth
         self.loss_smooth_f += self.criterionSmooth(self.f_depth, self.f_segment) * lambda_Smooth
+
+        # # flip semantic warp
+        # self.loss_seg_recon, self.warp_r_seg = self.criterionImgRecon(self.f_segment, self.flip_right_seg, self.f_depth, self.fb, warp_path=-1.0)
+        # self.loss_seg_recon *= lambda_seg_recon
+        # # semantic warp
+        # self.loss_lseg_recon, self.warp_l_seg = self.criterionImgRecon(self.segment, self.r_segment, self.l_depth, self.fb, warp_path=-1.0)
+        # self.loss_lseg_recon *= lambda_seg_recon
 
         self.loss_dep_con, _ = self.criterionImgRecon(self.l_depth, self.f_depth_flip, self.l_depth, self.fb, warp_path=-1.0)
         self.loss_dep_con  *= lambda_depth_con
